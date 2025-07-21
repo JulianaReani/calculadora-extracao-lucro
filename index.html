@@ -1,0 +1,1719 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculadora de Extração de Lucro - Transforme incertezas em certezas matemáticas no mercado imobiliário">
+    <meta name="keywords" content="calculadora, lucro, imobiliário, ROI, projeção, vendas">
+    <meta name="author" content="Calculadora de Extração de Lucro">
+    
+    <title>Calculadora de Extração de Lucro - Mercado Imobiliário</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💰</text></svg>">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Calculadora de Extração de Lucro">
+    <meta property="og:description" content="Transforme incertezas em certezas matemáticas no mercado imobiliário">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://via.placeholder.com/1200x630/3B82F6/white?text=Calculadora+de+Lucro">
+    
+    <!-- Preload Scripts -->
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js" as="script">
+    <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" as="script">
+    
+    <style>
+        :root {
+            --primary-color: #3B82F6;
+            --primary-dark: #1E40AF;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --danger-color: #EF4444;
+            --gray-50: #F9FAFB;
+            --gray-100: #F3F4F6;
+            --gray-200: #E5E7EB;
+            --gray-300: #D1D5DB;
+            --gray-600: #4B5563;
+            --gray-700: #374151;
+            --gray-900: #111827;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+            color: var(--gray-700);
+        }
+        
+        /* Loading Spinner */
+        .loading {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--gray-200);
+            border-top: 5px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+            overflow: hidden;
+            animation: slideUp 0.6s ease-out;
+        }
+        
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="2" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+            animation: float 20s linear infinite;
+        }
+        
+        @keyframes float {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            font-weight: 800;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header p {
+            opacity: 0.95;
+            font-size: 1.2rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .auth-section {
+            padding: 60px 40px;
+            text-align: center;
+            background: linear-gradient(135deg, var(--gray-50), white);
+        }
+        
+        .auth-section h2 {
+            margin-bottom: 30px;
+            color: var(--gray-900);
+            font-size: 2rem;
+            font-weight: 700;
+        }
+        
+        .auth-form {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .auth-section input {
+            width: 100%;
+            padding: 20px 25px;
+            border: 3px solid var(--gray-200);
+            border-radius: 15px;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            text-align: center;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-section input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .auth-section button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            padding: 20px 30px;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .auth-section button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4);
+        }
+        
+        .auth-section button:active {
+            transform: translateY(-1px);
+        }
+        
+        .demo-codes {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(59, 130, 246, 0.05);
+            border-radius: 15px;
+            border-left: 5px solid var(--primary-color);
+        }
+        
+        .demo-codes h4 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .demo-codes p {
+            color: var(--gray-600);
+            font-size: 0.95rem;
+            margin-bottom: 10px;
+        }
+        
+        .code-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .code-item {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .code-item:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+        
+        .main-content {
+            display: none;
+            padding: 40px;
+            animation: fadeIn 0.6s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        .user-welcome {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .welcome-text h3 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        
+        .welcome-text p {
+            opacity: 0.9;
+        }
+        
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .tabs {
+            display: flex;
+            background: var(--gray-100);
+            border-radius: 15px;
+            padding: 8px;
+            margin-bottom: 40px;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            flex: 1;
+            min-width: 120px;
+            padding: 18px 15px;
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .tab.active {
+            background: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            color: var(--primary-color);
+            transform: translateY(-2px);
+        }
+        
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.7);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+            animation: slideIn 0.4s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+        
+        .metric-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+            animation: shimmer 3s linear infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { transform: translate(-50%, -50%) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+        
+        .metric-card:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+        
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .metric-label {
+            opacity: 0.95;
+            font-size: 1rem;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .section-title::before {
+            content: '';
+            width: 4px;
+            height: 30px;
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            border-radius: 2px;
+        }
+        
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--gray-700);
+            font-size: 0.95rem;
+        }
+        
+        .form-group input, .form-group select {
+            padding: 15px 18px;
+            border: 2px solid var(--gray-200);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+        
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+            transform: translateY(-1px);
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success-color), #059669);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger-color), #DC2626);
+        }
+        
+        .chart-container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+            border: 1px solid var(--gray-100);
+        }
+        
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 25px;
+            color: var(--gray-900);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .projects-table {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin-top: 30px;
+            border: 1px solid var(--gray-100);
+        }
+        
+        .projects-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .projects-table th {
+            background: var(--gray-50);
+            padding: 20px 15px;
+            text-align: left;
+            font-weight: 700;
+            color: var(--gray-700);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .projects-table td {
+            padding: 20px 15px;
+            border-bottom: 1px solid var(--gray-100);
+            vertical-align: middle;
+        }
+        
+        .projects-table tr:hover {
+            background: var(--gray-50);
+        }
+        
+        .status-badge {
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .status-alta {
+            background: #dcfce7;
+            color: #166534;
+        }
+        
+        .status-media {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-baixa {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        
+        .range-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-top: 5px;
+        }
+        
+        .range-value {
+            background: var(--primary-color);
+            color: white;
+            padding: 8px 15px;
+            border-radius: 25px;
+            font-weight: 700;
+            min-width: 60px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        
+        input[type="range"] {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--gray-200);
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(59, 130, 246, 0.3);
+        }
+        
+        .hidden {
+            display: none !important;
+        }
+        
+        .recommendations {
+            display: grid;
+            gap: 20px;
+        }
+        
+        .recommendation-card {
+            padding: 20px;
+            border-radius: 15px;
+            border-left: 5px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .recommendation-card:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .recommendation-high {
+            background: #dcfce7;
+            border-color: var(--success-color);
+        }
+        
+        .recommendation-medium {
+            background: #fef3c7;
+            border-color: var(--warning-color);
+        }
+        
+        .recommendation-low {
+            background: #fee2e2;
+            border-color: var(--danger-color);
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .auth-section {
+                padding: 40px 20px;
+            }
+            
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .tab {
+                text-align: center;
+            }
+            
+            .projects-table {
+                overflow-x: auto;
+            }
+            
+            .user-welcome {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+        
+        /* Print Styles */
+        @media print {
+            body {
+                background: white;
+            }
+            
+            .header, .tabs, .btn, button {
+                display: none;
+            }
+            
+            .container {
+                box-shadow: none;
+                border: 1px solid #ccc;
+            }
+        }
+        
+        /* Accessibility */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+        
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            .chart-container, .projects-table {
+                border: 1px solid #374151;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Spinner -->
+    <div id="loadingSpinner" class="loading">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <h1>💰 Calculadora de Extração de Lucro</h1>
+            <p>Transforme incertezas em certezas matemáticas no mercado imobiliário</p>
+        </div>
+        
+        <div id="authSection" class="auth-section">
+            <h2>🔐 Acesso Exclusivo</h2>
+            <div class="auth-form">
+                <input type="text" id="activationCode" placeholder="INSIRA SEU CÓDIGO DE ATIVAÇÃO" maxlength="25" autocomplete="off">
+                <button onclick="validateCode()">🚀 ACESSAR PLATAFORMA</button>
+            </div>
+            
+            <div class="demo-codes">
+                <h4>🎯 Códigos de Demonstração</h4>
+                <p>Clique em qualquer código abaixo para testar a plataforma:</p>
+                <div class="code-list">
+                    <div class="code-item" onclick="fillCode('DEMO2025')">DEMO2025</div>
+                    <div class="code-item" onclick="fillCode('LUCRO2025')">LUCRO2025</div>
+                    <div class="code-item" onclick="fillCode('IMOVEL123')">IMOVEL123</div>
+                    <div class="code-item" onclick="fillCode('CALC456')">CALC456</div>
+                </div>
+                <p style="margin-top: 15px; font-size: 0.85rem; opacity: 0.8;">
+                    ⏰ Códigos demo válidos por 30 dias | 🎁 Funcionalidades completas
+                </p>
+            </div>
+        </div>
+        
+        <div id="mainContent" class="main-content">
+            <div id="userWelcome" class="user-welcome">
+                <div class="welcome-text">
+                    <h3>🎉 Bem-vindo(a), <span id="userName">Usuário</span>!</h3>
+                    <p>Plataforma ativada com sucesso. Comece a extrair lucros agora!</p>
+                </div>
+                <button class="logout-btn" onclick="logout()">🚪 Sair</button>
+            </div>
+
+            <div class="tabs">
+                <button class="tab active" onclick="showTab('dashboard')">📊 Dashboard</button>
+                <button class="tab" onclick="showTab('projects')">🏢 Projetos</button>
+                <button class="tab" onclick="showTab('config')">⚙️ Configurações</button>
+                <button class="tab" onclick="showTab('reports')">📈 Relatórios</button>
+            </div>
+            
+            <!-- Dashboard Tab -->
+            <div id="dashboard" class="tab-content active">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="projecaoAnual">R$ 0</div>
+                        <div class="metric-label">💰 Projeção Anual</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="projetosAtivos">0</div>
+                        <div class="metric-label">🏢 Projetos Ativos</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="taxaConversao">0%</div>
+                        <div class="metric-label">📈 Taxa Conversão</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="roiMedio">0%</div>
+                        <div class="metric-label">🎯 ROI Médio</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3 class="chart-title">📈 Projeção de Fluxo de Caixa (12 meses)</h3>
+                    <canvas id="fluxoCaixaChart" width="400" height="200"></canvas>
+                </div>
+                
+                <div class="chart-container">
+                    <h3 class="chart-title">🎯 ROI por Projeto</h3>
+                    <canvas id="roiChart" width="400" height="200"></canvas>
+                </div>
+            </div>
+            
+            <!-- Projects Tab -->
+            <div id="projects" class="tab-content">
+                <h2 class="section-title">➕ Adicionar Novo Projeto</h2>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>📝 Nome do Projeto</label>
+                        <input type="text" id="nomeProjeto" placeholder="Ex: Apartamento Vila Madalena">
+                    </div>
+                    <div class="form-group">
+                        <label>🏗️ Tipo</label>
+                        <select id="tipoProjeto">
+                            <option value="residencial">🏠 Residencial</option>
+                            <option value="comercial">🏢 Comercial</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>💎 Valor do Imóvel (R$)</label>
+                        <input type="number" id="valorProjeto" placeholder="850000">
+                    </div>
+                    <div class="form-group">
+                        <label>💰 Comissão Esperada (R$)</label>
+                        <input type="number" id="comissaoProjeto" placeholder="51000">
+                    </div>
+                    <div class="form-group">
+                        <label>📊 Probabilidade de Fechamento</label>
+                        <div class="range-container">
+                            <input type="range" id="probabilidadeProjeto" min="0" max="100" value="50" oninput="updateRangeValue('probabilidadeProjeto', 'probValue')">
+                            <span class="range-value" id="probValue">50%</span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>⏰ Tempo Estimado (dias)</label>
+                        <input type="number" id="tempoProjeto" placeholder="30">
+                    </div>
+                </div>
+                
+                <button class="btn btn-success" onclick="adicionarProjeto()">➕ ADICIONAR PROJETO</button>
+                
+                <div class="projects-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>📁 Projeto</th>
+                                <th>💎 Valor</th>
+                                <th>💰 Comissão</th>
+                                <th>📊 Probabilidade</th>
+                                <th>🎯 Fator Extração</th>
+                                <th>⚡ Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="projectsTableBody">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Config Tab -->
+            <div id="config" class="tab-content">
+                <h2 class="section-title">⚙️ Configurações de Mercado</h2>
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>🌍 Região de Atuação</label>
+                        <input type="text" id="regiao" placeholder="Ex: São Paulo - SP">
+                    </div>
+                    <div class="form-group">
+                        <label>🎯 Especialização</label>
+                        <select id="especializacao">
+                            <option value="residencial">🏠 Residencial</option>
+                            <option value="comercial">🏢 Comercial</option>
+                            <option value="ambos">🏠🏢 Ambos</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>📈 Taxa Média Financiamento (%)</label>
+                        <input type="number" id="taxaFinanciamento" value="10.5" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>💰 Comissão Média (%)</label>
+                        <input type="number" id="comissaoMedia" value="6" step="0.1">
+                    </div>
+                    <div class="form-group">
+                        <label>🎯 Taxa Conversão Média (%)</label>
+                        <input type="number" id="conversaoMedia" value="15">
+                    </div>
+                </div>
+                
+                <button class="btn" onclick="salvarConfiguracoes()">💾 SALVAR CONFIGURAÇÕES</button>
+            </div>
+            
+            <!-- Reports Tab -->
+            <div id="reports" class="tab-content">
+                <h2 class="section-title">📈 Análise Avançada</h2>
+                
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="roiGeral">0%</div>
+                        <div class="metric-label">🎯 ROI Geral</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="tempoMedioRetorno">0</div>
+                        <div class="metric-label">⏰ Tempo Médio (dias)</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="eficienciaPortfolio">0%</div>
+                        <div class="metric-label">⚡ Eficiência Portfolio</div>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h3 class="chart-title">🎯 Recomendações Estratégicas</h3>
+                    <div id="recomendacoes" class="recommendations"></div>
+                </div>
+                
+                <button class="btn btn-success" onclick="exportarRelatorio()">📄 EXPORTAR RELATÓRIO PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <script>
+        // Dados globais
+        let projetos = [
+            {
+                id: 1,
+                nome: 'Apartamento Vila Madalena',
+                tipo: 'residencial',
+                valor: 850000,
+                comissao: 51000,
+                probabilidade: 80,
+                tempo: 45
+            },
+            {
+                id: 2,
+                nome: 'Casa Jardins',
+                tipo: 'residencial',
+                valor: 1200000,
+                comissao: 72000,
+                probabilidade: 60,
+                tempo: 60
+            }
+        ];
+        
+        let config = {
+            regiao: 'São Paulo - SP',
+            especializacao: 'residencial',
+            taxaFinanciamento: 10.5,
+            comissaoMedia: 6,
+            conversaoMedia: 15
+        };
+        
+        // Códigos válidos com informações de usuário
+        const codigosValidos = {
+            'DEMO2025': { nome: 'Usuário Demo', tipo: 'demo' },
+            'LUCRO2025': { nome: 'Profissional', tipo: 'premium' },
+            'IMOVEL123': { nome: 'Corretor Expert', tipo: 'basic' },
+            'CALC456': { nome: 'Investidor Pro', tipo: 'premium' },
+            'TESTE2025': { nome: 'Usuário Teste', tipo: 'basic' }
+        };
+        
+        // Inicialização
+        window.addEventListener('load', function() {
+            // Remover loading spinner
+            setTimeout(() => {
+                document.getElementById('loadingSpinner').style.display = 'none';
+            }, 1000);
+            
+            verificarAtivacao();
+        });
+        
+        // Preencher código automaticamente
+        function fillCode(code) {
+            document.getElementById('activationCode').value = code;
+            document.getElementById('activationCode').focus();
+        }
+        
+        // Validar código de ativação
+        function validateCode() {
+            const codigo = document.getElementById('activationCode').value.toUpperCase().trim();
+            
+            if (codigosValidos[codigo]) {
+                const userData = codigosValidos[codigo];
+                
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                document.getElementById('userName').textContent = userData.nome;
+                
+                // Salvar ativação
+                localStorage.setItem('softwareAtivado', 'true');
+                localStorage.setItem('codigoAtivacao', codigo);
+                localStorage.setItem('userData', JSON.stringify(userData));
+                
+                inicializarApp();
+                
+                // Mostrar notificação de sucesso
+                showNotification('✅ Acesso liberado com sucesso!', 'success');
+            } else {
+                showNotification('❌ Código de ativação inválido! Verifique seu e-mail ou entre em contato com o suporte.', 'error');
+                document.getElementById('activationCode').style.borderColor = 'var(--danger-color)';
+                document.getElementById('activationCode').focus();
+            }
+        }
+        
+        // Verificar se já está ativado
+        function verificarAtivacao() {
+            if (localStorage.getItem('softwareAtivado') === 'true') {
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                
+                document.getElementById('authSection').style.display = 'none';
+                document.getElementById('mainContent').style.display = 'block';
+                document.getElementById('userName').textContent = userData.nome || 'Usuário';
+                
+                inicializarApp();
+            }
+        }
+        
+        // Logout
+        function logout() {
+            if (confirm('Tem certeza que deseja sair da plataforma?')) {
+                localStorage.removeItem('softwareAtivado');
+                localStorage.removeItem('codigoAtivacao');
+                localStorage.removeItem('userData');
+                
+                document.getElementById('authSection').style.display = 'block';
+                document.getElementById('mainContent').style.display = 'none';
+                document.getElementById('activationCode').value = '';
+                
+                showNotification('👋 Logout realizado com sucesso!', 'info');
+            }
+        }
+        
+        // Mostrar notificação
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 10px;
+                color: white;
+                font-weight: 600;
+                z-index: 10000;
+                max-width: 400px;
+                animation: slideInRight 0.3s ease-out;
+            `;
+            
+            const colors = {
+                success: 'background: linear-gradient(135deg, #10B981, #059669);',
+                error: 'background: linear-gradient(135deg, #EF4444, #DC2626);',
+                info: 'background: linear-gradient(135deg, #3B82F6, #1E40AF);',
+                warning: 'background: linear-gradient(135deg, #F59E0B, #D97706);'
+            };
+            
+            notification.style.cssText += colors[type];
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 4000);
+        }
+        
+        // Inicializar aplicação
+        function inicializarApp() {
+            carregarDados();
+            atualizarDashboard();
+            atualizarTabelaProjetos();
+            criarGraficos();
+            showNotification('🚀 Plataforma carregada com sucesso!', 'success');
+        }
+        
+        // Carregar dados salvos
+        function carregarDados() {
+            const projetosSalvos = localStorage.getItem('projetos');
+            const configSalva = localStorage.getItem('config');
+            
+            if (projetosSalvos) {
+                projetos = JSON.parse(projetosSalvos);
+            }
+            
+            if (configSalva) {
+                config = JSON.parse(configSalva);
+                
+                // Carregar nos campos
+                document.getElementById('regiao').value = config.regiao;
+                document.getElementById('especializacao').value = config.especializacao;
+                document.getElementById('taxaFinanciamento').value = config.taxaFinanciamento;
+                document.getElementById('comissaoMedia').value = config.comissaoMedia;
+                document.getElementById('conversaoMedia').value = config.conversaoMedia;
+            }
+        }
+        
+        // Salvar dados
+        function salvarDados() {
+            localStorage.setItem('projetos', JSON.stringify(projetos));
+            localStorage.setItem('config', JSON.stringify(config));
+        }
+        
+        // Calcular fator de extração
+        function calcularFatorExtracao(projeto) {
+            const roi = (projeto.comissao / (projeto.valor * 0.1)) * 100;
+            const fatorTempo = Math.max(1, 90 - projeto.tempo) / 90;
+            const fatorProbabilidade = projeto.probabilidade / 100;
+            return Math.round(roi * fatorTempo * fatorProbabilidade * 10) / 10;
+        }
+        
+        // Atualizar dashboard
+        function atualizarDashboard() {
+            const projecaoAnual = projetos.reduce((total, projeto) => 
+                total + (projeto.comissao * projeto.probabilidade / 100), 0);
+            
+            const roiMedio = projetos.length > 0 ? 
+                projetos.reduce((acc, p) => acc + calcularFatorExtracao(p), 0) / projetos.length : 0;
+            
+            document.getElementById('projecaoAnual').textContent = 
+                'R$ ' + projecaoAnual.toLocaleString('pt-BR');
+            document.getElementById('projetosAtivos').textContent = projetos.length;
+            document.getElementById('taxaConversao').textContent = config.conversaoMedia + '%';
+            document.getElementById('roiMedio').textContent = Math.round(roiMedio) + '%';
+            
+            // Atualizar relatórios
+            const totalInvestido = projetos.reduce((acc, p) => acc + p.valor * 0.1, 0);
+            const totalRetorno = projetos.reduce((acc, p) => acc + p.comissao, 0);
+            const roiGeral = totalInvestido > 0 ? ((totalRetorno - totalInvestido) / totalInvestido * 100) : 0;
+            
+            document.getElementById('roiGeral').textContent = roiGeral.toFixed(1) + '%';
+            document.getElementById('tempoMedioRetorno').textContent = 
+                projetos.length > 0 ? Math.round(projetos.reduce((acc, p) => acc + p.tempo, 0) / projetos.length) : 0;
+            document.getElementById('eficienciaPortfolio').textContent = 
+                projetos.length > 0 ? Math.round(projetos.filter(p => calcularFatorExtracao(p) > 50).length / projetos.length * 100) + '%' : '0%';
+        }
+        
+        // Atualizar tabela de projetos
+        function atualizarTabelaProjetos() {
+            const tbody = document.getElementById('projectsTableBody');
+            tbody.innerHTML = '';
+            
+            if (projetos.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-600);">
+                            📭 Nenhum projeto cadastrado ainda.<br>
+                            <small>Clique em "Adicionar Projeto" para começar!</small>
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            projetos.forEach((projeto, index) => {
+                const fator = calcularFatorExtracao(projeto);
+                let statusClass = 'status-baixa';
+                let statusText = 'Baixa';
+                
+                if (fator >= 70) {
+                    statusClass = 'status-alta';
+                    statusText = 'Alta';
+                } else if (fator >= 40) {
+                    statusClass = 'status-media';
+                    statusText = 'Média';
+                }
+                
+                const row = `
+                    <tr>
+                        <td>
+                            <strong>${projeto.nome}</strong><br>
+                            <small style="color: var(--gray-600);">${projeto.tipo === 'residencial' ? '🏠' : '🏢'} ${projeto.tipo}</small>
+                        </td>
+                        <td>R$ ${projeto.valor.toLocaleString('pt-BR')}</td>
+                        <td>R$ ${projeto.comissao.toLocaleString('pt-BR')}</td>
+                        <td><span class="status-badge ${statusClass}">${projeto.probabilidade}%</span></td>
+                        <td><strong style="color: var(--primary-color);">${fator}</strong></td>
+                        <td>
+                            <button onclick="removerProjeto(${index})" class="btn btn-danger" style="padding: 8px 12px; font-size: 0.8rem;">
+                                🗑️ Remover
+                            </button>
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+        
+        // Adicionar projeto
+        function adicionarProjeto() {
+            const nome = document.getElementById('nomeProjeto').value.trim();
+            const tipo = document.getElementById('tipoProjeto').value;
+            const valor = parseFloat(document.getElementById('valorProjeto').value);
+            const comissao = parseFloat(document.getElementById('comissaoProjeto').value);
+            const probabilidade = parseInt(document.getElementById('probabilidadeProjeto').value);
+            const tempo = parseInt(document.getElementById('tempoProjeto').value);
+            
+            if (!nome || !valor || !comissao || !tempo) {
+                showNotification('❌ Preencha todos os campos obrigatórios!', 'error');
+                return;
+            }
+            
+            if (valor <= 0 || comissao <= 0 || tempo <= 0) {
+                showNotification('❌ Valores devem ser maiores que zero!', 'error');
+                return;
+            }
+            
+            const novoProjeto = {
+                id: Date.now(),
+                nome, tipo, valor, comissao, probabilidade, tempo
+            };
+            
+            projetos.push(novoProjeto);
+            salvarDados();
+            atualizarDashboard();
+            atualizarTabelaProjetos();
+            criarGraficos();
+            
+            // Limpar formulário
+            document.getElementById('nomeProjeto').value = '';
+            document.getElementById('valorProjeto').value = '';
+            document.getElementById('comissaoProjeto').value = '';
+            document.getElementById('tempoProjeto').value = '';
+            document.getElementById('probabilidadeProjeto').value = 50;
+            document.getElementById('probValue').textContent = '50%';
+            
+            showNotification('✅ Projeto adicionado com sucesso!', 'success');
+        }
+        
+        // Remover projeto
+        function removerProjeto(index) {
+            if (confirm('Tem certeza que deseja remover este projeto?')) {
+                const projeto = projetos[index];
+                projetos.splice(index, 1);
+                salvarDados();
+                atualizarDashboard();
+                atualizarTabelaProjetos();
+                criarGraficos();
+                
+                showNotification(`🗑️ Projeto "${projeto.nome}" removido com sucesso!`, 'info');
+            }
+        }
+        
+        // Salvar configurações
+        function salvarConfiguracoes() {
+            config.regiao = document.getElementById('regiao').value.trim();
+            config.especializacao = document.getElementById('especializacao').value;
+            config.taxaFinanciamento = parseFloat(document.getElementById('taxaFinanciamento').value);
+            config.comissaoMedia = parseFloat(document.getElementById('comissaoMedia').value);
+            config.conversaoMedia = parseInt(document.getElementById('conversaoMedia').value);
+            
+            salvarDados();
+            atualizarDashboard();
+            showNotification('✅ Configurações salvas com sucesso!', 'success');
+        }
+        
+        // Mostrar tab
+        function showTab(tabName) {
+            // Esconder todas as tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Mostrar tab selecionada
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabName === 'reports') {
+                atualizarRecomendacoes();
+            }
+        }
+        
+        // Atualizar valor do range
+        function updateRangeValue(rangeId, valueId) {
+            const range = document.getElementById(rangeId);
+            const valueDisplay = document.getElementById(valueId);
+            valueDisplay.textContent = range.value + '%';
+        }
+        
+        // Criar gráficos
+        function criarGraficos() {
+            criarGraficoFluxoCaixa();
+            criarGraficoROI();
+        }
+        
+        function criarGraficoFluxoCaixa() {
+            const ctx = document.getElementById('fluxoCaixaChart').getContext('2d');
+            
+            if (window.fluxoCaixaChart instanceof Chart) {
+                window.fluxoCaixaChart.destroy();
+            }
+            
+            const dadosFluxo = [];
+            for (let mes = 1; mes <= 12; mes++) {
+                let receita = 0;
+                projetos.forEach(projeto => {
+                    if (projeto.tempo <= mes * 30) {
+                        receita += projeto.comissao * (projeto.probabilidade / 100);
+                    }
+                });
+                dadosFluxo.push(receita);
+            }
+            
+            window.fluxoCaixaChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'],
+                    datasets: [{
+                        label: 'Receita Projetada',
+                        data: dadosFluxo,
+                        borderColor: '#3B82F6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        borderWidth: 4,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#3B82F6',
+                        pointBorderColor: '#ffffff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#3B82F6',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return 'R$ ' + value.toLocaleString('pt-BR');
+                                },
+                                color: '#6b7280'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                color: '#6b7280'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function criarGraficoROI() {
+            const ctx = document.getElementById('roiChart').getContext('2d');
+            
+            if (window.roiChart instanceof Chart) {
+                window.roiChart.destroy();
+            }
+            
+            if (projetos.length === 0) {
+                ctx.fillStyle = '#6b7280';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('📊 Adicione projetos para visualizar o gráfico', ctx.canvas.width/2, ctx.canvas.height/2);
+                return;
+            }
+            
+            const dadosROI = projetos.map(projeto => ({
+                nome: projeto.nome.length > 15 ? projeto.nome.substring(0, 15) + '...' : projeto.nome,
+                roi: calcularFatorExtracao(projeto)
+            }));
+            
+            window.roiChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: dadosROI.map(d => d.nome),
+                    datasets: [{
+                        label: 'Fator de Extração',
+                        data: dadosROI.map(d => d.roi),
+                        backgroundColor: '#10B981',
+                        borderColor: '#059669',
+                        borderWidth: 2,
+                        borderRadius: 8,
+                        borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleColor: '#ffffff',
+                            bodyColor: '#ffffff',
+                            borderColor: '#10B981',
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                },
+                                color: '#6b7280'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            },
+                            ticks: {
+                                color: '#6b7280',
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Atualizar recomendações
+        function atualizarRecomendacoes() {
+            const container = document.getElementById('recomendacoes');
+            container.innerHTML = '';
+            
+            if (projetos.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--gray-600);">
+                        📊 Adicione projetos para visualizar recomendações estratégicas
+                    </div>
+                `;
+                return;
+            }
+            
+            projetos.forEach(projeto => {
+                const fator = calcularFatorExtracao(projeto);
+                let recomendacao = '';
+                let classe = '';
+                let emoji = '';
+                
+                if (fator >= 70) {
+                    recomendacao = 'Projeto prioritário - Alto potencial de lucro. Concentre seus esforços aqui para maximizar retornos!';
+                    classe = 'recommendation-high';
+                    emoji = '🚀';
+                } else if (fator >= 40) {
+                    recomendacao = 'Projeto viável - Potencial moderado de retorno. Monitore evolução e busque otimizações.';
+                    classe = 'recommendation-medium';
+                    emoji = '⚠️';
+                } else {
+                    recomendacao = 'Revisar estratégia - Baixo retorno esperado. Considere renegociar comissão ou abandonar.';
+                    classe = 'recommendation-low';
+                    emoji = '❌';
+                }
+                
+                const div = document.createElement('div');
+                div.className = `recommendation-card ${classe}`;
+                div.innerHTML = `
+                    <h4 style="margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.5rem;">${emoji}</span>
+                        ${projeto.nome}
+                    </h4>
+                    <p style="margin-bottom: 10px; line-height: 1.6;">${recomendacao}</p>
+                    <div style="display: flex; gap: 20px; font-size: 0.9rem; opacity: 0.8;">
+                        <span>🎯 Fator: ${fator}</span>
+                        <span>💰 ROI: ${(projeto.comissao/projeto.valor*100).toFixed(1)}%</span>
+                        <span>⏰ Tempo: ${projeto.tempo} dias</span>
+                    </div>
+                `;
+                
+                container.appendChild(div);
+            });
+        }
+        
+        // Exportar relatório PDF
+        function exportarRelatorio() {
+            try {
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Configurações do PDF
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                let yPosition = 20;
+                
+                // Função para adicionar texto
+                const addText = (text, size = 12, style = 'normal', align = 'left') => {
+                    doc.setFontSize(size);
+                    doc.setFont('helvetica', style);
+                    
+                    if (align === 'center') {
+                        doc.text(text, pageWidth / 2, yPosition, { align: 'center' });
+                    } else {
+                        doc.text(text, 20, yPosition);
+                    }
+                    yPosition += size * 0.5 + 3;
+                };
+                
+                // Função para verificar quebra de página
+                const checkPageBreak = (nextContentHeight = 25) => {
+                    if (yPosition + nextContentHeight > pageHeight - 20) {
+                        doc.addPage();
+                        yPosition = 20;
+                    }
+                };
+                
+                // Cabeçalho
+                addText('CALCULADORA DE EXTRAÇÃO DE LUCRO', 22, 'bold', 'center');
+                addText('RELATÓRIO EXECUTIVO COMPLETO', 16, 'bold', 'center');
+                yPosition += 10;
+                
+                // Linha decorativa
+                doc.setLineWidth(0.8);
+                doc.setDrawColor(59, 130, 246);
+                doc.line(20, yPosition, pageWidth - 20, yPosition);
+                yPosition += 20;
+                
+                // Informações básicas
+                addText(`Data de Geração: ${new Date().toLocaleDateString('pt-BR')}`, 12);
+                addText(`Região de Atuação: ${config.regiao}`, 12);
+                addText(`Especialização: ${config.especializacao}`, 12);
+                addText(`Usuário: ${document.getElementById('userName').textContent}`, 12);
+                yPosition += 15;
+                
+                // Cálculos para métricas
+                const projecaoAnual = projetos.reduce((total, projeto) => 
+                    total + (projeto.comissao * projeto.probabilidade / 100), 0);
+                const roiMedio = projetos.length > 0 ? 
+                    projetos.reduce((acc, p) => acc + calcularFatorExtracao(p), 0) / projetos.length : 0;
+                const totalInvestido = projetos.reduce((acc, p) => acc + p.valor * 0.1, 0);
+                const totalRetorno = projetos.reduce((acc, p) => acc + p.comissao, 0);
+                const roiGeral = totalInvestido > 0 ? ((totalRetorno - totalInvestido) / totalInvestido * 100) : 0;
+                
+                // Resumo Executivo
+                checkPageBreak(70);
+                addText('RESUMO EXECUTIVO', 18, 'bold');
+                yPosition += 5;
+                
+                // Box destacado para métricas
+                doc.setFillColor(240, 248, 255);
+                doc.rect(15, yPosition - 8, pageWidth - 30, 55, 'F');
+                doc.setDrawColor(59, 130, 246);
+                doc.setLineWidth(1);
+                doc.rect(15, yPosition - 8, pageWidth - 30, 55);
+                
+                addText(`💰 Projeção Anual: R$ ${projecaoAnual.toLocaleString('pt-BR')}`, 14, 'bold');
+                addText(`🏢 Projetos Ativos: ${projetos.length}`, 14, 'bold');
+                addText(`📈 Taxa de Conversão: ${config.conversaoMedia}%`, 14, 'bold');
+                addText(`🎯 ROI Médio do Portfólio: ${Math.round(roiMedio)}%`, 14, 'bold');
+                yPosition += 20;
+                
+                // Análise Detalhada
+                checkPageBreak(50);
+                addText('ANÁLISE DETALHADA DE PERFORMANCE', 18, 'bold');
+                yPosition += 5;
+                
+                addText(`ROI Geral do Portfólio: ${roiGeral.toFixed(1)}%`, 12);
+                addText(`Tempo Médio de Retorno: ${projetos.length > 0 ? Math.round(projetos.reduce((acc, p) => acc + p.tempo, 0) / projetos.length) : 0} dias`, 12);
+                addText(`Eficiência do Portfólio: ${projetos.length > 0 ? Math.round(projetos.filter(p => calcularFatorExtracao(p) > 50).length / projetos.length * 100) : 0}%`, 12);
+                addText(`Investimento Total Estimado: R$ ${totalInvestido.toLocaleString('pt-BR')}`, 12);
+                addText(`Retorno Total Projetado: R$ ${totalRetorno.toLocaleString('pt-BR')}`, 12);
+                yPosition += 15;
+                
+                // Projetos Detalhados
+                if (projetos.length > 0) {
+                    checkPageBreak(40);
+                    addText('PROJETOS DETALHADOS', 18, 'bold');
+                    yPosition += 5;
+                    
+                    projetos.forEach((projeto, index) => {
+                        checkPageBreak(40);
+                        
+                        const fator = calcularFatorExtracao(projeto);
+                        
+                        // Box para cada projeto
+                        doc.setFillColor(248, 250, 252);
+                        doc.rect(15, yPosition - 8, pageWidth - 30, 35, 'F');
+                        doc.setDrawColor(200, 200, 200);
+                        doc.setLineWidth(0.5);
+                        doc.rect(15, yPosition - 8, pageWidth - 30, 35);
+                        
+                        addText(`${index + 1}. ${projeto.nome} (${projeto.tipo})`, 13, 'bold');
+                        addText(`   Valor: R$ ${projeto.valor.toLocaleString('pt-BR')} | Comissão: R$ ${projeto.comissao.toLocaleString('pt-BR')}`, 10);
+                        addText(`   Probabilidade: ${projeto.probabilidade}% | Tempo: ${projeto.tempo} dias | Fator Extração: ${fator}`, 10);
+                        yPosition += 8;
+                    });
+                }
+                
+                // Recomendações Estratégicas
+                checkPageBreak(50);
+                addText('RECOMENDAÇÕES ESTRATÉGICAS', 18, 'bold');
+                yPosition += 5;
+                
+                if (projetos.length === 0) {
+                    addText('• Adicione projetos para receber recomendações personalizadas', 12);
+                } else {
+                    projetos.forEach((projeto, index) => {
+                        checkPageBreak(25);
+                        
+                        const fator = calcularFatorExtracao(projeto);
+                        let recomendacao = '';
+                        let cor = [0, 0, 0];
+                        
+                        if (fator >= 70) {
+                            recomendacao = 'PRIORITÁRIO - Alto potencial de lucro. Concentre esforços aqui!';
+                            cor = [22, 101, 52];
+                        } else if (fator >= 40) {
+                            recomendacao = 'VIÁVEL - Monitorar evolução e buscar otimizações';
+                            cor = [146, 64, 14];
+                        } else {
+                            recomendacao = 'REVISAR - Baixo retorno. Considere renegociar ou abandonar';
+                            cor = [153, 27, 27];
+                        }
+                        
+                        doc.setTextColor(cor[0], cor[1], cor[2]);
+                        addText(`• ${projeto.nome}: ${recomendacao}`, 11);
+                        doc.setTextColor(0, 0, 0);
+                    });
+                }
+                
+                // Conclusão
+                checkPageBreak(40);
+                addText('CONCLUSÃO E PRÓXIMOS PASSOS', 18, 'bold');
+                yPosition += 5;
+                
+                const projetosAltos = projetos.filter(p => calcularFatorExtracao(p) >= 70).length;
+                const projetosBaixos = projetos.filter(p => calcularFatorExtracao(p) < 40).length;
+                
+                addText('Baseado na análise dos dados:', 12, 'bold');
+                addText(`• ${projetosAltos} projeto(s) com alta prioridade identificado(s)`, 12);
+                addText(`• ${projetosBaixos} projeto(s) necessitam revisão de estratégia`, 12);
+                addText(`• Potencial de geração de R$ ${projecaoAnual.toLocaleString('pt-BR')} em 12 meses`, 12);
+                yPosition += 10;
+                
+                addText('Recomendações gerais:', 12, 'bold');
+                addText('• Foque nos projetos com fator de extração acima de 70', 12);
+                addText('• Revise ou abandone projetos com fator abaixo de 40', 12);
+                addText('• Monitore a evolução dos projetos médios (40-70)', 12);
+                addText('• Atualize regularmente as probabilidades de fechamento', 12);
+                
+                // Rodapé
+                checkPageBreak(35);
+                yPosition = pageHeight - 35;
+                doc.setFontSize(9);
+                doc.setTextColor(100, 100, 100);
+                doc.text('Relatório gerado pela Calculadora de Extração de Lucro', 20, yPosition);
+                doc.text(`© ${new Date().getFullYear()} - Todos os direitos reservados`, 20, yPosition + 8);
+                doc.text(`Página 1 de ${doc.internal.getNumberOfPages()}`, pageWidth - 40, yPosition);
+                
+                // Salvar o PDF
+                const userData = JSON.parse(localStorage.getItem('userData') || '{}');
+                const dataAtual = new Date().toISOString().split('T')[0];
+                const nomeArquivo = `Relatorio_Extracao_Lucro_${userData.nome || 'Usuario'}_${dataAtual}.pdf`;
+                
+                doc.save(nomeArquivo);
+                
+                showNotification('📄 Relatório PDF exportado com sucesso!', 'success');
+                
+            } catch (error) {
+                console.error('Erro ao exportar PDF:', error);
+                showNotification('❌ Erro ao exportar relatório. Tente novamente.', 'error');
+            }
+        }
+        
+        // Permitir Enter para ativação
+        document.addEventListener('DOMContentLoaded', function() {
+            const activationInput = document.getElementById('activationCode');
+            if (activationInput) {
+                activationInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        validateCode();
+                    }
+                });
+                
+                // Limpar estilo de erro ao digitar
+                activationInput.addEventListener('input', function() {
+                    this.style.borderColor = 'var(--gray-200)';
+                });
+            }
+        });
+        
+        // Adicionar estilo de CSS dinamicamente para animações
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideInRight {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
